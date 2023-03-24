@@ -1,0 +1,36 @@
+version: "3"
+services:
+  db:
+    image: mysql:latest
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: 'fullstack'
+      MYSQL_USER: 'splint'
+      MYSQL_PASSWORD: '12345678'
+      MYSQL_ROOT_PASSWORD: '12345678'
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
+    networks:
+      - test
+
+  back:
+    build: .
+    ports:
+      - 8080:8080
+    expose:
+      - 8080
+    depends_on:
+      - db
+    restart: always
+    networks:
+      - test
+      
+volumes:
+  db:
+
+networks:
+  test:
+    driver: bridge
