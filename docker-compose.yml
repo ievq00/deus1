@@ -2,8 +2,9 @@ version: "3"
 services:
   db:
     image: mysql:latest
+    container_name: db
     volumes:
-      - db:/var/lib/mysql
+      - ./vol/db:/var/lib/mysql
     environment:
       MYSQL_DATABASE: 'fullstack'
       MYSQL_USER: 'splint'
@@ -13,12 +14,12 @@ services:
 #      - 3306:3306
     expose:
       - 3306
-    networks:
-      - test
+    restart: always
 
   backend:
-    build: backend/.
-#    image: backend
+    build: ./backend
+    image: backend
+    container_name: backend
 #    ports:
 #      - 8080:8080
     expose:
@@ -26,23 +27,31 @@ services:
     depends_on:
       - db
     restart: always
-    networks:
-      - test
 
   frontend:
-    build: frontend/.
-#    image: frontend
+    build:
+      context: ./frontend
+      args:
+        REACT_APP_PUBLIC_URL: ${REACT_APP_PUBLIC_URL}
+    image: frontend
+    container_name: frontend
 #    ports:
-#      - 80:80
+#      - 88:80
     expose:
       - 80
     restart: always
-    networks:
-      - test
 
-volumes:
-  db:
+  nginx-proxy:
+    image: nginx:1.23.3-alpine-slim
+    container_name: nginx-proxy
+    volumes:
+      - ./vol/nginx/src:/usr/share/nginx/html
+      - ./vol/nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+    expose:
+      - 80
+    restart: always
 
-networks:
-  test:
-    driver: bridge
+#volumes:
+#  db:

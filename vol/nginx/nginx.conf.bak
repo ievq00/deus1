@@ -1,0 +1,23 @@
+events {}
+http {
+upstream backend_hosts {
+  server ievq.fvds.ru:8080;
+  }
+upstream frontend_hosts {
+  server ievq.fvds.ru:88;
+  }
+server {
+  listen 80;
+  server_name _;
+  location / {
+    proxy_pass http://frontend_hosts;
+    }
+  }
+server {
+  listen 8080;
+  server_name _;
+  location / {
+    proxy_pass http://backend_hosts;
+    }
+  }
+}
